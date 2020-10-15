@@ -65,7 +65,7 @@
                                  (if (empty? path)
                                    (reset! app-state new-coll)
                                    (swap! app-state assoc-in path new-coll))
-                                 (ok-cb)) 1000))))]))
+                                 (ok-cb "Did it!")) 1000))))]))
            ;; (if (= v :coll-pen/delete)
            ;;     (if (set? new-coll)
            ;;       (if (empty? path)

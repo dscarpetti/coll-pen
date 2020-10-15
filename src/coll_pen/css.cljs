@@ -148,6 +148,7 @@ a.coll-pen-button.coll-pen-disabled:hover {  color: "disabled"; }
 .coll-pen-noselect { user-select: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; }
 
 .coll-pen-success-floater { color: "active"; position: relative; bottom: 2em; width: 0; text-align: center; opacity: 0;
+white-space: nowrap;
                 -webkit-animation: 2s ease-out 0s 1 coll-pen-floater;
                 animation: 2s ease-out 0s 1 coll-pen-floater; }
 

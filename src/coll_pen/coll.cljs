@@ -183,10 +183,10 @@
                     (open-editor!))))
 
         on-save (fn [coll new-value ok-cb fail-cb]
-                  (let [-ok-cb (fn [] (ok-cb)
+                  (let [-ok-cb (fn [content] (ok-cb)
                                  (close-editor!)
                                  (clear-error! nil)
-                                 (set-success! nil)
+                                 (set-success! content)
                                  (when (keyword-identical? :set coll-type)
                                    (reset! focus-entry {path new-value
                                                         :focus-key (str react-key "*" new-value)}))

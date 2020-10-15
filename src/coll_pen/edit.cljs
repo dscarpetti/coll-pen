@@ -353,7 +353,7 @@
                         new-key (:validated key)
                         is-valid (and (:is-valid key) (:is-valid val))]
                     (when is-valid
-                      (let [ok-cb (fn [] (close-editor!) (clear-waiting!) (clear-error! nil) (set-success! nil) (set-focus! new-key))
+                      (let [ok-cb (fn [content] (close-editor!) (clear-waiting!) (clear-error! nil) (set-success! content) (set-focus! new-key))
                             fail-cb (fn [content]
                                       (swap! init-states assoc-in [path init-state-key] revert-data)
                                       (input/set-global-focus-key! input-focus-key)
