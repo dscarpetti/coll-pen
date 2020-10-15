@@ -187,7 +187,8 @@
   (let [init-states (:init-states config)
         init-state-key [coll-type :edit k]
         init-val-str (pprint-str init-val)
-        delete-on-empty (not (keyword-identical? :vec coll-type))
+        delete-on-empty (or (not (keyword-identical? :vec coll-type))
+                            (= (dec (count coll)) k))
         original-val (get coll k)
         data (if-let [existing-state (get-in @init-states [path init-state-key])]
                (r/atom existing-state)
@@ -215,12 +216,17 @@
                       (when (and is-valid (not delete))
                         (start-waiting!)
                         (on-save coll validated clear-init-state! (build-fail-handler))))))
+        kb-delete (fn [coll]
+                    (when delete-on-empty
+                      (start-waiting!)
+                      (on-delete coll clear-init-state! (build-fail-handler))))
         on-delete (fn [coll]
                     (let [raw (:raw @data)
                           {:keys [is-valid delete]} (validate raw original-val delete-on-empty)]
                       (when (and is-valid delete)
                         (start-waiting!)
                         (on-delete coll clear-init-state! (build-fail-handler)))))
+
         on-cancel (fn [] (on-cancel clear-init-state!))]
     (fn [config focus-key coll path coll-type k init-val _ _ _]
       (let [{:keys [raw validated is-valid is-changed class delete waiting] :as val-data} @data]
@@ -238,8 +244,8 @@
                           (case (.-key e)
                             "Escape" (on-cancel)
                             "Enter" (when (or (.-metaKey e) (.-ctrlKey e)) (on-save coll))
-                            "Backspace"(when (or (.-metaKey e) (.-ctrlKey e)) (on-delete coll))
-                            "Delete" (when (or (.-metaKey e) (.-ctrlKey e)) (on-delete coll))
+                            "Backspace"(when (or (.-metaKey e) (.-ctrlKey e)) (kb-delete coll))
+                            "Delete" (when (or (.-metaKey e) (.-ctrlKey e)) (kb-delete coll))
                         nil))}
           [editor-text-area focus-key val-data original-val merge-change! delete-on-empty nil "" false]
           [editor-controls (when is-valid #(on-save coll)) (when (and is-valid delete) #(on-delete coll)) on-cancel]]]))))
@@ -362,5 +368,5 @@
             [:div.coll-pen-editor-controls.coll-pen-coll-paginator
              ;{:ref #(reset! focus-el %)}
              (button "+" "create"  open-editor! false "col-pen-add" #(reset! focus-el %))
-             (when (keyword-identical? coll-type :vec)
+             #_(when (keyword-identical? coll-type :vec)
                (button "−" "pop" #() (empty? coll) "col-pen-remove"))]])]))))

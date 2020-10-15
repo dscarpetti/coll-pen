@@ -204,7 +204,15 @@
                           -fail-cb (fn [content] (fail-cb) (set-error! (or content "Error")))]
                       (try
                         (edit-handler {:old-coll coll
-                                       :new-coll (if (= coll-type :set) (disj coll k) (dissoc coll k))
+                                       :new-coll (case coll-type
+                                                   :map (dissoc coll k)
+                                                   :vec (if (= k (dec (count coll)))
+                                                          (pop coll)
+                                                          (throw
+                                                           (ex-info "can only delete last element from vector"
+                                                                    {:vector coll :last-index (dec (count coll)) :delete-index k})))
+
+                                                   :set (disj k))
                                        :path path
                                        :key k
                                        :old-value v
