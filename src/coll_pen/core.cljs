@@ -12,7 +12,7 @@
 (defn clear-dynamic-reload-states! [] (reset! reload-states {}))
 
 (defn -draw [coll load-data-fn estimated-count-fn expanded-paths
-             el-per-page disable-loading-animation #_auto-loading
+             el-per-page disable-loading-animation always-highlight
              palette dynamic-reload-key edit-handler search-handler search-instructions]
   (let [css-link (css/gen-css-link-el palette)
         depth-colors (css/get-depth-colors palette)
@@ -38,28 +38,32 @@
                                                "…"
                                                v)))
                                          (constantly "…"))}
-        tab-highlight (r/atom true)]
+        tab-highlight (r/atom true)
+        on-key-down (when-not always-highlight
+                      (fn [e]
+                        (when (and (not @tab-highlight) (= (.-key e) "Tab"))
+                          (reset! tab-highlight true))))
+        on-click (when-not always-highlight
+                   (fn [e]
+                     (when @tab-highlight
+                       (reset! tab-highlight false))))]
 
     (when (and dynamic-reload-key (nil? (@reload-states dynamic-reload-key)))
       (swap! reload-states assoc dynamic-reload-key init-states))
 
     (fn [coll load-data-fn estimated-count-fn expanded-paths
-         el-per-page disable-loading-animation #_auto-loading
+         el-per-page disable-loading-animation always-highlight
          palette dynamic-reload-key edit-handler search-handler search-instructions]
       (let [highlight @tab-highlight]
-        [:span {:on-key-down (fn [e]
-                               (when (and (not highlight) (= (.-key e) "Tab"))
-                                 (reset! tab-highlight true)))
-                :on-click (fn [e]
-                            (when highlight
-                              (reset! tab-highlight false)))}
+        [:span {:on-key-down on-key-down
+                :on-click on-click}
          css-link
          [:div.coll-pen
           {:class (if highlight "coll-pen-highlight-on" "coll-pen-highlight-off")}
           (coll/draw-el config coll [])]]))))
 
-(defn draw [coll & {:keys [load-data-fn estimated-count-fn expanded-paths el-per-page disable-loading-animation #_auto-loading palette
-                           dynamic-reload-key edit-handler search-handler search-instructions]
+(defn draw [coll & {:keys [load-data-fn estimated-count-fn expanded-paths el-per-page disable-loading-animation always-highlight
+                           palette dynamic-reload-key edit-handler search-handler search-instructions]
                     :or {expanded-paths '([]) el-per-page 10 palette :dark search-handler :subs}}]
   (let [el-per-page (if (and (number? el-per-page) (pos? el-per-page))
                       el-per-page
@@ -68,7 +72,7 @@
         search-instructions (or search-instructions (:coll-pen/instructions (meta search-handler)) "Search")]
     [-draw
      coll load-data-fn estimated-count-fn expanded-paths
-     el-per-page disable-loading-animation #_auto-loading
+     el-per-page disable-loading-animation always-highlight
      palette dynamic-reload-key edit-handler search-handler search-instructions]))
 ;(clear-dynamic-reload-states!)
 (demo/render draw)

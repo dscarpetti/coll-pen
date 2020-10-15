@@ -53,6 +53,7 @@
            :estimated-count-fn count
            :load-data-fn (fn [coll path cb]
                            (js/setTimeout cb 1000))
+           ;;:always-highlight true
            ;;:palette :light
            ;:search-handler false
            :edit-handler
