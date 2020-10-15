@@ -6,6 +6,7 @@
    [coll-pen.input :as input]
    [reagent.core :as r]))
 
+
 (defn longest-line [val max-size min-size]
   (let [len (min max-size (+ 1 (reduce max min-size (map count (str/split val #"\n")))))]
     (if (or (js/isNaN len) (== 0 len))
@@ -252,6 +253,42 @@
 
 
 
+(defn success-floater [k msg clear!]
+  (let [timeout (atom nil)]
+    (r/create-class
+     {:display-name "success-floater"
+      :component-did-mount #(reset! timeout (js/setTimeout clear! 3000))
+      :component-did-update #(do
+                               (when-let [t @timeout]
+                                 (js/clearTimeout t))
+                               (reset! timeout (js/setTimeout clear! 3000)))
+      :reagent-render
+      (fn [k msg clear!]
+        (let [message (or msg "✓")]
+          [:div.coll-pen-success-floater {:key k
+                                          :aria-role "alert"
+                                          :aria-label (or msg "success")
+                                          :style {:right (str (count message) "ch")}
+                                          } message ]))})))
+
+(defn success-floater-bar [k msg clear!]
+  (let [timeout (atom nil)]
+    (r/create-class
+     {:display-name "success-floater"
+      :component-did-mount #(reset! timeout (js/setTimeout clear! 3000))
+      :component-did-update #(do
+                               (when-let [t @timeout]
+                                 (js/clearTimeout t))
+                               (reset! timeout (js/setTimeout clear! 3000)))
+      :reagent-render
+      (fn [k msg clear!]
+        (let [message (or msg "✓")]
+          [:div.coll-pen-success-floater-bar {:key k
+                                              :aria-role "alert"
+                                              :aria-label (or msg "success")
+                                              } message ]))})))
+
+
 (defn value-adder [edit-handler config focus-key coll path coll-type set-focus!]
   (let [is-map (keyword-identical? :map coll-type)
         focus-el (atom nil)
@@ -262,6 +299,10 @@
                           (str focus-key "val"))
 
         data (r/atom (get-in @init-states [path init-state-key]))
+
+        success (r/atom nil)
+        set-success! #(reset! success [(str (gensym "success")) %])
+        clear-success! #(reset! success nil)
 
         error (r/atom (get-in @init-states [path [coll-type :add :error]]))
         clear-error! #(do (when % (.stopPropagation %))
@@ -312,7 +353,7 @@
                         new-key (:validated key)
                         is-valid (and (:is-valid key) (:is-valid val))]
                     (when is-valid
-                      (let [ok-cb (fn [] (close-editor!) (clear-waiting!) (clear-error! nil) (set-focus! new-key))
+                      (let [ok-cb (fn [] (close-editor!) (clear-waiting!) (clear-error! nil) (set-success! nil) (set-focus! new-key))
                             fail-cb (fn [content]
                                       (swap! init-states assoc-in [path init-state-key] revert-data)
                                       (input/set-global-focus-key! input-focus-key)
@@ -351,6 +392,9 @@
             [:div.coll-pen-waiting-cover]
             [:div.coll-pen-waiting-positioner
              [:div.coll-pen-waiting-value [:div.coll-pen-spinner #_{:on-click clear-waiting!}]]]])
+         (when-let [success @success]
+           (let [[k msg] success]
+             [success-floater-bar k msg clear-success!]))
          (when-let [error @error]
            (error-alert error clear-error! true))
          (if expanded

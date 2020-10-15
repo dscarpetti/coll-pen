@@ -147,6 +147,24 @@ a.coll-pen-button.coll-pen-disabled:hover {  color: "disabled"; }
 
 .coll-pen-noselect { user-select: none; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; }
 
+.coll-pen-success-floater { color: "active"; position: relative; bottom: 2em; width: 0; text-align: center; opacity: 0;
+                -webkit-animation: 2s ease-out 0s 1 coll-pen-floater;
+                animation: 2s ease-out 0s 1 coll-pen-floater; }
+
+.coll-pen-success-floater-bar { color: "active"; position: relative; bottom: 2em; height: 0; text-align: center; opacity: 0;
+                -webkit-animation: 2s ease-out 0s 1 coll-pen-floater;
+                animation: 2s ease-out 0s 1 coll-pen-floater; }
+
+@keyframes coll-pen-floater {
+  0%  { bottom: 0px; opacity: 1;}
+  100% { bottom: 2em; opacity: 0;}
+}
+@-webkit-keyframes coll-pen-floater {
+  0%  { bottom: 0px; opacity: 1;}
+  100% { bottom: 2em; opacity: 0;}
+}
+
+
 .coll-pen-spinner {box-sizing: border-box;
                  display: inline-block; width: .8em; height: .8em; border-radius: 25%; border: 1px solid "control"; margin: .1em;
                  -webkit-animation: coll-pen-spinner-reshape 2s infinite ease-in-out both;

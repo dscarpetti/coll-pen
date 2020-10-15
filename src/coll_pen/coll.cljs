@@ -150,6 +150,10 @@
         init-states (:init-states config)
         focus-key (str react-key "*" k)
         editor-react-key (str react-key "+" k)
+        success (r/atom nil)
+        set-success! #(reset! success [(str (gensym "success")) %])
+        clear-success! #(reset! success nil)
+
         error (r/atom (get-in @init-states [path [k :error]]))
         clear-error! #(do (when % (.stopPropagation %))
                           (swap! init-states update path dissoc [k :error])
@@ -182,6 +186,7 @@
                   (let [-ok-cb (fn [] (ok-cb)
                                  (close-editor!)
                                  (clear-error! nil)
+                                 (set-success! nil)
                                  (when (keyword-identical? :set coll-type)
                                    (reset! focus-entry {path new-value
                                                         :focus-key (str react-key "*" new-value)}))
@@ -200,7 +205,7 @@
                         (-fail-cb "update handler error")))))
 
         on-delete (fn [coll ok-cb fail-cb]
-                    (let [-ok-cb (fn [] (ok-cb) (close-editor!) (clear-error! nil) (input/delay-focus! focus-el))
+                    (let [-ok-cb (fn [] (ok-cb) (close-editor!) (clear-error! nil) (set-success! nil) (input/delay-focus! focus-el))
                           -fail-cb (fn [content] (fail-cb) (set-error! (or content "Error")))]
                       (try
                         (edit-handler {:old-coll coll
@@ -254,7 +259,12 @@
            (edit/error-alert error clear-error!))
          (cond
            editing [edit/value-editor config editor-react-key coll path coll-type k v on-save on-delete on-cancel]
-           (not is-set) (draw-el config v (conj path k)))]))})))
+           (not is-set) (draw-el config v (conj path k)))
+         (when-let [success @success]
+           (let [[k msg] success]
+             [edit/success-floater k msg clear-success!]))
+
+         ]))})))
 
 (defn draw-data-coll [react-key config coll path coll-type delim-color on-click pagination status-line vec-offset aria-label
                       original-coll]
