@@ -60,7 +60,11 @@
              (condp < (rand)
                10.9 (js/setTimeout #(fail-cb "Random failure") 1000)
                10.8 (throw (ex-info "some error" {:nothing :really}))
-               (js/setTimeout #(do (swap! app-state assoc-in path new-coll) (ok-cb)) 1000))))]))
+               (js/setTimeout #(do
+                                 (if (empty? path)
+                                   (reset! app-state new-coll)
+                                   (swap! app-state assoc-in path new-coll))
+                                 (ok-cb)) 1000))))]))
            ;; (if (= v :coll-pen/delete)
            ;;     (if (set? new-coll)
            ;;       (if (empty? path)
