@@ -146,10 +146,13 @@
                   @res
                   res)))))))))
 
+(def focus-entry (r/atom nil))
+
 (defn draw-entry [edit-handler config react-key coll path coll-type k v]
   (let [is-set (keyword-identical? :set coll-type)
         focus-el (atom nil)
         init-states (:init-states config)
+        focus-key (str react-key "*" k)
         editor-react-key (str react-key "+" k)
         error (r/atom (get-in @init-states [path [k :error]]))
         clear-error! #(do (when % (.stopPropagation %))
@@ -183,6 +186,9 @@
                   (let [-ok-cb (fn [] (ok-cb)
                                  (close-editor!)
                                  (clear-error! nil)
+                                 (when (keyword-identical? :set coll-type)
+                                   (reset! focus-entry {path new-value
+                                                        :focus-key (str react-key "*" new-value)}))
                                  (input/delay-focus! focus-el))
                         -fail-cb (fn [content] (fail-cb) (set-error! (or content "Error")))]
                     (try
@@ -217,7 +223,15 @@
                     (close-editor!)
                     (input/delay-focus! focus-el))]
 
-
+    (r/create-class
+     {:display-name "draw-entry"
+      :component-did-mount (fn []
+                             ;;(println focus-key (get @focus-entry :focus-key))
+                             (when (= (get @focus-entry :focus-key) focus-key)
+                               (println "FOCUS" focus-key @focus-el)
+                               (reset! focus-entry nil)
+                               (when @focus-el (.focus @focus-el))))
+      :reagent-render
     (fn [edit-handler config react-key coll path coll-type k v]
       (let [editing @editor-open]
         [:span.coll-pen-el
@@ -236,7 +250,7 @@
            (edit/error-alert error clear-error!))
          (cond
            editing [edit/value-editor config editor-react-key coll path coll-type k v on-save on-delete on-cancel]
-           (not is-set) (draw-el config v (conj path k)))]))))
+           (not is-set) (draw-el config v (conj path k)))]))})))
 
 (defn draw-data-coll [react-key config coll path coll-type delim-color on-click pagination status-line vec-offset aria-label
                       original-coll]
@@ -273,7 +287,8 @@
                                 [draw-entry edit-handler config react-key original-coll path coll-type v v]) coll))
              (doall (map-indexed (fn [i v] [:span.coll-pen-el {:key (str coll-type "-" i)} (draw-leaf v)]) coll)))
            (when (and edit-handler (not (keyword-identical? coll-type :seq)))
-             [edit/value-adder edit-handler config (str react-key "_") original-coll path coll-type])
+             [edit/value-adder edit-handler config (str react-key "_") original-coll path coll-type
+              #(reset! focus-entry {path %})])
            (delim/close coll-type delim-color width)]))})))
 
 (defn draw-coll [config coll path]
@@ -419,44 +434,27 @@
 
     (r/create-class
      {:display-name "draw-coll"
-      ;; :UNSAFE_component-will-receive-props #(fn [x [_ _ coll path]]
-      ;;                                        (println coll))
-      ;; :component-did-update (fn [x [_ _ coll path]]
-      ;;                         (if-let [created-key (get @created-path-key path)]
-      ;;                           (let [current-page @local-state
-      ;;                                 keys (case coll-type
-      ;;                                        :map (mapv first (seq coll))
-      ;;                                        :set (vec (seq coll)))]
-      ;;                             (loop [i (long 0)]
-      ;;                               (when (< i (count keys))
-      ;;                                 (if (= (keys i) created-key)
-      ;;                                   (let [new-page (quot i el-per-page)]
-      ;;                                     (println "new-page" new-page created-key i)
-      ;;                                     (reset! created-path-key nil)
-      ;;                                     (when-not (= current-page new-page)
-      ;;                                       (change-page! :current-page coll current-page new-page)))
-      ;;                                   (recur (inc i))))))))
-      ;;:component-did-update loading-monitor
+      :UNSAFE_component-will-receive-props
+      (fn [x [_ _ coll path]]
+        (when-let [fk (get @focus-entry path)]
+          (let [current-page @local-state
+                index (if (keyword-identical? :vec coll-type)
+                        fk
+                        (let [keys (case coll-type
+                                     :map (mapv first (seq coll))
+                                     :set (vec (seq coll)))]
+                          (loop [i (long 0)]
+                            (when (< i (count keys))
+                              (if (= (keys i) fk)
+                                i
+                                (recur (inc i)))))))
 
-      #_:get-derived-state-from-props #_(fn [x y z]
-                                      (println "getting derived state" x y z)
-                                      #_(when-let [k @jump-key]
-                                (println "JUMP KEY" k)
-                                (let [current-page @local-state
-                                      keys (case coll-type
-                                             :map (vec (keys coll))
-                                             :set (vec coll))]
-                                  (loop [i (long 0)]
-                                    (when (< i (count keys))
-                                      (if (= (keys i) k)
-                                        (let [new-page (quot i el-per-page)]
-                                          (println "new-page" new-page)
-                                          (reset! jump-key nil)
-                                          (when-not (= current-page new-page)
-                                            (change-page! :current-page coll current-page new-page))))
-                                      (recur (inc i))))))
-                                      nil)
-
+                new-page (quot index el-per-page)]
+            (if (= current-page new-page)
+              (reset! focus-entry nil)
+              (do
+                (swap! focus-entry dissoc path)
+                (change-page! :current-page coll current-page new-page))))))
       :reagent-render
       (fn [config coll path]
         (let [{:keys [expanded current-page loading jump-reset search search-page]} @local-state

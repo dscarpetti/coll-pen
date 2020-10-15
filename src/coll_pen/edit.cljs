@@ -246,7 +246,7 @@
 
 
 
-(defn value-adder [edit-handler config focus-key coll path coll-type]
+(defn value-adder [edit-handler config focus-key coll path coll-type set-focus!]
   (let [is-map (keyword-identical? :map coll-type)
         focus-el (atom nil)
         init-states (:init-states config)
@@ -297,16 +297,16 @@
                   (let [{:keys [key val] :as revert-data} @data
                         raw-key (:raw key)
                         raw-val (:raw val)
+                        val (validate raw-val ::nothing false)
+                        new-val (:validated val)
                         key (case coll-type
                               :map (validate raw-key ::nothing false)
                               :vec {:validated (count coll) :is-valid true}
-                              :set {:is-valid true})
-                        val (validate raw-val ::nothing false)
-                        is-valid (and (:is-valid key) (:is-valid val))
+                              :set {:validated new-val :is-valid true})
                         new-key (:validated key)
-                        new-val (:validated val)]
+                        is-valid (and (:is-valid key) (:is-valid val))]
                     (when is-valid
-                      (let [ok-cb (fn [] (close-editor!) (clear-waiting!) (clear-error! nil))
+                      (let [ok-cb (fn [] (close-editor!) (clear-waiting!) (clear-error! nil) (set-focus! new-key))
                             fail-cb (fn [content]
                                       (swap! init-states assoc-in [path init-state-key] revert-data)
                                       (input/set-global-focus-key! input-focus-key)
@@ -336,7 +336,7 @@
                      (swap! data update :val merge new-data))
 
         ]
-    (fn [edit-handler config focus-key coll path coll-type k v]
+    (fn [edit-handler config focus-key coll path coll-type set-focus!]
       (let [{:keys [key val waiting] :as expanded} @data
             is-valid (and (:is-valid key) (:is-valid val))]
         [:div.coll-pen-waiting-outer
