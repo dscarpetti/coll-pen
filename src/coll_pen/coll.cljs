@@ -122,10 +122,6 @@
             [edit/value-adder edit-handler config (str react-key "_") original-coll path coll-type])
           (delim/close coll-type delim-color "5")]])})))
 
-#_(defn pprint-str [x]
-  (str/trim (with-out-str (pprint x))))
-
-
 (defn recursively-check-loaded-status [init-states parent-coll parent-path k]
   (let [coll (get parent-coll k)]
     (when (coll? coll)
@@ -318,52 +314,24 @@
 
         load-data-fn (:load-data-fn config)
         disable-loading-animation false;;(:disable-loading-animation config)
-        ;; use-loading-callbacks (:use-loading-callbacks config)
-
-        ;; loading-status (atom nil)
-        ;; loading-monitor (if (or use-loading-callbacks disable-loading-animation)
-        ;;                   (fn [& args])
-        ;;                   (fn [& args]
-        ;;                     (when @loading-status
-        ;;                       (if (== 0 @loading-status)
-        ;;                         (swap! loading-status inc)
-        ;;                         (do
-        ;;                           (input/set-global-focus-key! react-key)
-        ;;                           (reset! loading-status nil)
-        ;;                           #_(js/setTimeout #(swap! local-state dissoc :loading) 5000)
-        ;;                           (swap! local-state dissoc :loading))))))
 
         loaded-callback (fn callback [_new-coll]
                           (input/set-global-focus-key! react-key)
-                          ;;(reset! loading-status nil)
                           (swap! init-states update path dissoc :loading)
                           (swap! local-state dissoc :loading))
 
         on-click (if load-data-fn
-                   ;;(if use-loading-callbacks
-                     (fn [e]
-                       (.stopPropagation e)
-                       (input/set-global-focus-key! react-key)
-                       (swap! init-states update-in [path :expanded] not)
-                       (if (:loaded @local-state)
-                         (swap! local-state update :expanded not)
-                         (do
-                           (swap! init-states update path merge {:expanded true :loaded true :loading true
-                                                                 #_(not disable-loading-animation)})
-                           (swap! local-state assoc :expanded true :loaded true :loading true #_(not disable-loading-animation))
-                           (load-data-fn coll path loaded-callback))))
-                     ;; (fn [e]
-                     ;;   (.stopPropagation e)
-                     ;;   (input/set-global-focus-key! react-key)
-                     ;;   (swap! init-states update-in [path :expanded] not)
-                     ;;   (if (:loaded @local-state)
-                     ;;     (swap! local-state update :expanded not)
-                     ;;     (if (= "0" (get-collapsed-content coll))
-                     ;;       (swap! local-state assoc :expanded true :loaded true)
-                     ;;       (do
-                     ;;         (reset! loading-status 0)
-                     ;;         (swap! local-state assoc :expanded true :loaded true :loading (not disable-loading-animation))
-                     ;;         (load-data-fn coll path loaded-callback))))))
+                   (fn [e]
+                     (.stopPropagation e)
+                     (input/set-global-focus-key! react-key)
+                     (swap! init-states update-in [path :expanded] not)
+                     (if (:loaded @local-state)
+                       (swap! local-state update :expanded not)
+                       (do
+                         (swap! init-states update path merge {:expanded true :loaded true :loading true
+                                                               #_(not disable-loading-animation)})
+                         (swap! local-state assoc :expanded true :loaded true :loading true #_(not disable-loading-animation))
+                         (load-data-fn coll path loaded-callback))))
                    (fn [e]
                      (.stopPropagation e)
                      (input/set-global-focus-key! react-key)
@@ -426,12 +394,7 @@
                             (swap! local-state dissoc :jump-reset))))
         delim-color ((:get-delim-color config) path)
 
-        aria-label (str (coll-name coll-type) " at " react-key)
-
-        ;;jump-key (atom nil)
-        ;;jump-to-key! #(do (println "setting jump key" %) (reset! jump-key %));;(js/setTimeout (fn [] (reset! jump-key %)) 1000)
-        ]
-
+        aria-label (str (coll-name coll-type) " at " react-key)]
     (r/create-class
      {:display-name "draw-coll"
       :UNSAFE_component-will-receive-props

@@ -73,6 +73,6 @@
   ([focus-el-atom]
    (delay-focus! focus-el-atom 8))
   ([focus-el-atom retries]
-   (println retries)
+   ;;(println retries)
    (when (pos? retries)
      (js/setTimeout (fn [] (if @focus-el-atom (.focus @focus-el-atom) (delay-focus! focus-el-atom (dec retries)))) 25))))
