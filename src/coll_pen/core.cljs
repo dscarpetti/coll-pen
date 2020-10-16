@@ -17,7 +17,8 @@
   (let [css-link (css/gen-css-link-el palette)
         depth-colors (css/get-depth-colors palette)
         depth-color-count (count depth-colors)
-
+        supplied-expanded-paths expanded-paths
+        expanded-paths (when (coll? expanded-paths) expanded-paths)
         init-states (if (or (not dynamic-reload-key) (nil? (@reload-states dynamic-reload-key)))
                       (atom (reduce (fn [m path] (assoc m path {:expanded true :loaded true})) {} expanded-paths))
                       (@reload-states dynamic-reload-key))
@@ -26,6 +27,7 @@
                 :search-handler search-handler
                 :search-instructions search-instructions
                 :init-states init-states
+                :default-expanded (keyword? supplied-expanded-paths)
                 ;;:use-loading-callbacks (not auto-loading)
                 :disable-loading-animation disable-loading-animation
                 :load-data-fn load-data-fn

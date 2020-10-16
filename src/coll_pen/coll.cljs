@@ -74,7 +74,7 @@
         [:span.coll-pen-el.coll-pen-collapsed {:ref #(reset! el %)
                                                          :key react-key :on-click on-click :on-key-press enter-click
                                                          :aria-label (str "loading " aria-label) :aria-expanded true
-                                                         :title "clear loading animation" :tabindex "0" :role "button"}
+                                                         :title "clear loading animation" :tab-index "0" :role "button"}
          [:span.coll-pen-coll
           (delim/open coll-type delim-color "5")
           [:span.coll-pen-handle "×"]
@@ -92,7 +92,7 @@
                                                          :key react-key :on-click on-click :on-key-press enter-click
                                                          :aria-label (str aria-label " estimated size is " content)
                                                          :aria-expanded false
-                                                         :title "expand" :tabindex "0" :role "button"}
+                                                         :title "expand" :tab-index "0" :role "button"}
          [:span.coll-pen-coll
           (delim/open coll-type delim-color "5")
           [:span.coll-pen-handle "+"]
@@ -112,7 +112,7 @@
           [:span.coll-pen-handle
            {:ref #(reset! el %)
             :title "collapse empty"
-            :tabindex "0" :role "button"
+            :tab-index "0" :role "button"
             :aria-label aria-label :aria-expanded true
             :on-click on-click :on-key-press enter-click}
            "−"]
@@ -248,7 +248,7 @@
            [:span (when edit-handler
                     {:class (when-not editing "coll-pen-editor-button")
                      :ref #(reset! focus-el %) ;:style {:cursor :pointer}
-                     :title (str "edit " k) :role "button" :tabindex "0"
+                     :title (str "edit " k) :role "button" :tab-index "0"
                      :aria-label (str "edit " (conj path k)) :aria-expanded editor-open
                      :on-click (when-not editing #(open! % v)) :on-key-press enter-click})
             (case coll-type
@@ -281,7 +281,7 @@
            {:key react-key
             :class (case coll-type :map "coll-pen-map" :vec "coll-pen-vec" :set "coll-pen-set" "coll-pen-seq")}
            [:span.coll-pen-handle {:ref #(reset! el %)
-                                        :title "collapse" :tabindex "0" :role "button"
+                                        :title "collapse" :tab-index "0" :role "button"
                                         :aria-label aria-label :aria-expanded true
                                         :on-click on-click :on-key-press enter-click} "−"]
            (delim/open coll-type delim-color width)
@@ -342,9 +342,10 @@
                    (fn [e]
                      (.stopPropagation e)
                      (input/set-global-focus-key! react-key)
-                     (swap! init-states update-in [path :expanded] not)
                      (if (:loaded @local-state)
-                       (swap! local-state update :expanded not)
+                       (do
+                         (swap! init-states update-in [path :expanded] not)
+                         (swap! local-state update :expanded not))
                        (do
                          (swap! init-states update path merge {:expanded true :loaded true :loading true
                                                                #_(not disable-loading-animation)})
@@ -415,6 +416,11 @@
         aria-label (str (coll-name coll-type) " at " react-key)]
     (r/create-class
      {:display-name "draw-coll"
+      ;; :component-did-mount (fn []
+      ;;                        (println (:default-expanded config) (nil? (:expanded @local-state)))
+      ;;                        (when (and (:default-expanded config) (nil? (:expanded @local-state)))
+      ;;                          (swap! init-states assoc-in [path :expanded] true)
+      ;;                          (swap! local-state assoc :expanded true)))
       :UNSAFE_component-will-receive-props
       (fn [x [_ _ coll path]]
         (when-let [fk (get @focus-entry path)]
@@ -439,6 +445,7 @@
       :reagent-render
       (fn [config coll path]
         (let [{:keys [expanded current-page loading jump-reset search search-page]} @local-state
+              expanded (or expanded (and (nil? expanded) (:default-expanded config)))
               len (count coll)]
           (cond
             (not expanded) [draw-collapsed-coll react-key coll-type delim-color on-click (get-collapsed-content coll) aria-label]

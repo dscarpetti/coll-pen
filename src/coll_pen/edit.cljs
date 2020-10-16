@@ -37,7 +37,7 @@
    (when content
      [:span.coll-pen-alert.coll-pen-error
       {:aria-role :alert
-       :tabindex "0"
+       :tab-index "0"
        :style {:cursor :pointer}
        :title "clear alert"
        :on-click clear-fn
@@ -47,7 +47,7 @@
    (when content
      [:div.coll-pen-alert.coll-pen-error
       {:aria-role :alert
-       :tabindex "0"
+       :tab-index "0"
        :style {:cursor :pointer}
        :title "clear alert"
        :on-click clear-fn
@@ -58,7 +58,7 @@
   (when content
     [:span.coll-pen-alert.coll-pen-success
      {:aria-role :alert
-      :tabindex "0"
+      :tab-index "0"
       :style {:cursor :pointer}
       :title "clear alert"
       :on-click clear-fn
