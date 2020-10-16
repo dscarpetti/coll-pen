@@ -1,9 +1,8 @@
-(ns ^:figwheel-hooks coll-pen.core
+(ns coll-pen.core
   (:require
    [coll-pen.coll :as coll]
    [coll-pen.css :as css]
    [coll-pen.delim :as delim]
-   [coll-pen.demo :as demo]
    [coll-pen.search :as search]
    [reagent.core :as r]))
 
@@ -143,5 +142,3 @@
      coll load-data-fn estimated-count-fn expanded-paths
      el-per-page always-highlight
      palette dynamic-reload-key edit-handler search-handler search-instructions]))
-
-(demo/render draw)
