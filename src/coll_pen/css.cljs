@@ -8,7 +8,7 @@
   (str "
 
 .coll-pen-reader-label { display: inline-block; width: 0; height: 0; display: none; }
-.coll-pen { background-color: "background"; }
+.coll-pen { background-color: "background"; width: max-content; }
 .coll-pen-value-collapsed { color: "control"; }
 .coll-pen-value-string { color: "string"; }
 .coll-pen-value-keyword { color: "keyword"; }
