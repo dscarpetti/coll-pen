@@ -5,6 +5,8 @@
    [reagent.core :as r]
    [reagent.dom :as rdom]))
 
+(defrecord Hyperlink [text url])
+(defrecord Image [alt src])
 ;; define your app data so that it doesn't get over-written on reload
 (def app-state (r/atom {;;:reloads 0
                             :people [{:name {:first "Jane" :last "Smith"}
@@ -49,25 +51,48 @@
                                             ["vector" "value"]
                                             {:map :value}
                                             #{:set-value}
-                                            (:seq value))}}))
+                                            (:seq value))}
+                            :truncated "an unreasonably long string which will be truncated with default settings"
+                            :custom-renderer-examples
+                            {:mona-lisa {:url (->Hyperlink "Wikipedia - Mona Lisa" "https://commons.wikimedia.org/wiki/File:Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg")
+                                         :img (->Image
+                                               "monalisa"
+                                               "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg")}}
+                        }))
+
+(def custom-css [:link {:rel "stylesheet" :type "text/css"
+                        :href
+                        (coll-pen.css/to-encoded-css-uri
+                         (str
+                          ".coll-pen-value a:hover::after, .coll-pen-value-leaf a:focus::after { content: \" ↗\"; }
+                           .coll-pen-value a { color: #7cb7ba; }
+                           .coll-pen-value img {width: 100px}"))}])
+
+
 
 
 (defn demo []
   (let [state @app-state]
-    (draw state :dynamic-reload-key ::demo
-          :estimated-count-fn count
-          :load-data-fn (fn [coll path cb]
-                          (js/setTimeout cb 1000))
-          :edit-handler
-          (fn [{:keys [old-coll new-coll path k old-value new-value delete]} ok-cb fail-cb]
-            (condp < (rand)
-              .95 (js/setTimeout #(fail-cb "Random failure") 1000)
-              .90 (throw (ex-info "Random error" {:nothing :really}))
-              (js/setTimeout #(do
-                                (if (empty? path)
-                                  (reset! app-state new-coll)
+    [:div
+     custom-css
+     (draw state :dynamic-reload-key ::demo
+           :estimated-count-fn count
+           :custom-renderer (fn [val]
+                              (cond
+                                (instance? Hyperlink val) [:a {:target "_blank" :href (:url val)} (:text val)]
+                                (instance? Image val) [:img {:alt (:alt val) :src (:src val)}]))
+           :load-data-fn (fn [coll path cb]
+                           (js/setTimeout cb 1000))
+           :edit-handler
+           (fn [{:keys [old-coll new-coll path k old-value new-value delete]} ok-cb fail-cb]
+             (condp < (rand)
+               .95 (js/setTimeout #(fail-cb "Random failure") 1000)
+               .90 (throw (ex-info "Random error" {:nothing :really}))
+               (js/setTimeout #(do
+                                 (if (empty? path)
+                                   (reset! app-state new-coll)
                                   (swap! app-state assoc-in path new-coll))
-                                (ok-cb "Did it!")) 1000))))))
+                                 (ok-cb "Did it!")) 1000))))]))
 
 
 (defn render []

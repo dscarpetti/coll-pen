@@ -24,7 +24,7 @@
                     :else "sequence")
     :else (type v)))
 
-(defn draw-value [t v]
+(defn draw-value [config t v]
   (cond
     (keyword? v) [:span.coll-pen-value.coll-pen-value-keyword
                   {:class (str "coll-pen-value-" t)}
@@ -36,27 +36,41 @@
                  (if-let [ns (namespace v)]
                    [:span [:span.coll-pen-value-namespace ns] [:span (name v)]]
                    (str v))]
-    :else [:span.coll-pen-value
-           {:class (str "coll-pen-value-" t " coll-pen-value-"
-                        (cond
-                          (string? v) "string"
-                          ;;(keyword? v) "keyword"
-                          ;;(symbol? v) "symbol"
-                          (number? v) "number"
-                          (coll? v) "coll"
-                          :else "other"))}
-           (pr-str v)]))
+    :else (let [sv (pr-str v)
+                sv (if-let [truncate (:truncate config)]
+                     (if (<= (count sv) truncate)
+                       sv
+                       (str (str/trim (subs sv 0 truncate)) "…"))
+                     sv)]
+            [:span.coll-pen-value
+             {:class (str "coll-pen-value-" t " coll-pen-value-"
+                          (cond
+                            (string? v) "string"
+                            ;;(keyword? v) "keyword"
+                            ;;(symbol? v) "symbol"
+                            (number? v) "number"
+                            (coll? v) "coll"
+                            :else "other"))}
+             sv])))
 
-(defn draw-map-key [k]
-  (draw-value "map-key" k))
+(defn draw-map-key [config k]
+  (draw-value config "map-key" k))
 
 (defn draw-vec-idx [idx]
   [:span.coll-pen-value.coll-pen-value-vec-idx.coll-pen-value-number
    {:aria-label (str "index " idx)}
    idx])
 
-(defn draw-leaf [el]
-  (draw-value "leaf" el))
+(defn draw-leaf [config el]
+  (if-let [custom-leaf-renderer (config :custom-leaf-renderer)]
+    (let [res (custom-leaf-renderer el)]
+      (if (nil? res)
+        (draw-value config "leaf" el)
+        [:span.coll-pen-value res]))
+    (draw-value config "leaf" el)))
+
+(defn draw-direct-leaf [config el]
+  (draw-value config "leaf" el))
 
 (defn enter-click [e]
   (when (= "Enter" (.-key e))
@@ -252,9 +266,9 @@
                      :aria-label (str "edit " (conj path k)) :aria-expanded editor-open
                      :on-click (when-not editing #(open! % v)) :on-key-press enter-click})
             (case coll-type
-              :map (draw-map-key k)
+              :map (draw-map-key config k)
               :vec (draw-vec-idx k)
-              :set (draw-leaf k))])
+              :set (draw-leaf config k))])
          (when-let [error @error]
            (edit/error-alert error clear-error!))
          (cond
@@ -299,7 +313,7 @@
                                 coll)))
              :set (doall (map (fn [v] ^{:key (str coll-type v)}
                                 [draw-entry edit-handler config react-key original-coll path coll-type v v]) coll))
-             (doall (map-indexed (fn [i v] [:span.coll-pen-el {:key (str coll-type "-" i)} (draw-leaf v)]) coll)))
+             (doall (map-indexed (fn [i v] [:span.coll-pen-el {:key (str coll-type "-" i)} (draw-leaf config v)]) coll)))
            (when (and edit-handler (not (keyword-identical? coll-type :seq)))
              [edit/value-adder edit-handler config (str react-key "_") original-coll path coll-type
               #(reset! focus-entry {path %})])
@@ -496,6 +510,13 @@
                     ))))})))
 
 (defn draw-el [config el path]
-  (if (coll? el)
-    [draw-coll config el path]
-    (draw-leaf el)))
+  (if-let [custom-renderer (:custom-renderer config)]
+    (let [res (custom-renderer el)]
+      (if (nil? res)
+        (if (coll? el)
+          [draw-coll config el path]
+          (draw-direct-leaf config el))
+        [:div.coll-pen-value res]))
+    (if (coll? el)
+      [draw-coll config el path]
+      (draw-direct-leaf config el))))

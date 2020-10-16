@@ -14,7 +14,7 @@
   (reset! reload-states {}))
 
 (defn -draw [coll load-data-fn estimated-count-fn expanded-paths
-             el-per-page always-highlight
+             el-per-page always-highlight custom-renderer truncate
              palette dynamic-reload-key edit-handler search-handler search-instructions]
   (let [css-link (css/gen-css-link-el palette)
         depth-colors (css/get-depth-colors palette)
@@ -30,8 +30,10 @@
                 :search-instructions search-instructions
                 :init-states init-states
                 :default-expanded (keyword? supplied-expanded-paths)
+                :custom-renderer custom-renderer
                 ;;:use-loading-callbacks (not auto-loading)
                 ;;:disable-loading-animation disable-loading-animation
+                :truncate truncate
                 :load-data-fn load-data-fn
                 :el-per-page el-per-page
                 :get-delim-color (fn [path] (depth-colors (rem (count path) depth-color-count)))
@@ -56,7 +58,7 @@
       (swap! reload-states assoc dynamic-reload-key init-states))
 
     (fn [coll load-data-fn estimated-count-fn expanded-paths
-         el-per-page always-highlight
+         el-per-page always-highlight custom-renderer truncate
          palette dynamic-reload-key edit-handler search-handler search-instructions]
       (let [highlight @tab-highlight]
         [:span {:on-key-down on-key-down
@@ -93,12 +95,14 @@
 
     :search-handler -> one of the keywords indicating a built-in search function:
                         :regex -> regular expression search
-                        :subs -> sub-string search
+                        :subs (default) -> sub-string search
                         :prefix -> string prefix search
                         :eq -> equality/exact match search
 
                        optionally a function can be supplied which takes two arguments
                        [coll search-string] and returns a collection of results.
+
+                       if set to nil, search controls will not be present
 
     :search-instructions -> Search instructions to display to the user (can be used to
                             override instructions for the default search handlers)
@@ -114,6 +118,8 @@
 
     :el-per-page -> how many elements in a collection should be displayed before paginating
 
+    :truncate -> number of characters before truncation (no truncation if nil) defaults to 35
+
     :palette -> a keyword :dark (default) or :light which determines the fonts/color scheme. It
                 can also be a map containing the following keys specifying colors (and font)
                    :background   :foreground   :shadow    :highlight
@@ -122,6 +128,10 @@
                 missing keys will be substituted from the :dark theme. If a font is specified,
                 it should be monospaced.
 
+    :custom-renderer -> a function of one argument [value] which will be called to render
+                        collections or leaf values in collections.
+                        If the result is nil default rendering will be used.
+
     :always-highlight -> by default highlighting behavior is reduced when using mouse-interaction
                          setting this to true will always use keyboard-interaction highlight
                          behavior.
@@ -129,16 +139,17 @@
     :dynamic-reload-key -> if provided, it will be used to preserve the internal state of the
                            display across dynamic reloads. Useful when using tools like figwheel."
   [coll & {:keys [load-data-fn edit-handler search-handler search-instructions
-                  expanded-paths estimated-count-fn el-per-page ;;disable-loading-animation
-                  always-highlight palette dynamic-reload-key ]
-                    :or {expanded-paths '([]) el-per-page 10 palette :dark search-handler :subs}}]
+                  expanded-paths estimated-count-fn el-per-page truncate palette custom-renderer
+                  always-highlight dynamic-reload-key ]
+                    :or {expanded-paths '([]) el-per-page 10 truncate 35 palette :dark search-handler :subs}}]
   (let [el-per-page (if (and (number? el-per-page) (pos? el-per-page))
                       el-per-page
                       10)
         estimated-count-fn (if estimated-count-fn estimated-count-fn (when-not load-data-fn count))
         search-handler (search/get-search-handler search-handler)
+        truncate (when (int? truncate) truncate)
         search-instructions (or search-instructions (:coll-pen/instructions (meta search-handler)) "Search")]
     [-draw
      coll load-data-fn estimated-count-fn expanded-paths
-     el-per-page always-highlight
+     el-per-page always-highlight custom-renderer truncate
      palette dynamic-reload-key edit-handler search-handler search-instructions]))

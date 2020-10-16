@@ -189,7 +189,7 @@ white-space: nowrap;
 
 "))
 
-(defn- to-encoded-css-uri [s]
+(defn to-encoded-css-uri [s]
   (str "data:text/css;charest=UTF-8," (js/encodeURIComponent s)))
 
 (def default-palette :dark)
