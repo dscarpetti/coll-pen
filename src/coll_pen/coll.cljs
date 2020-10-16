@@ -331,7 +331,7 @@
                          (swap! local-state assoc k new-page)))
 
         load-data-fn (:load-data-fn config)
-        disable-loading-animation false;;(:disable-loading-animation config)
+        ;;disable-loading-animation false;;(:disable-loading-animation config)
 
         loaded-callback (fn callback [_new-coll]
                           (input/set-global-focus-key! react-key)
