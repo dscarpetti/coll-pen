@@ -10,7 +10,7 @@
 .coll-pen-reader-label { display: inline-block; width: 0; height: 0; display: none; }
 .coll-pen { background-color: "background"; width: max-content; max-width: 100%; }
 .coll-pen-value-collapsed { color: "control"; }
-.coll-pen-value-string { color: "string"; word-break: break-all; }
+.coll-pen-value-string { color: "string"; }
 .coll-pen-value-keyword { color: "keyword"; white-space: nowrap;}
 .coll-pen-value-namespace { color: "active"; white-space: nowrap; }
 .coll-pen-value-namespace::after { content: \"/\" ; color: "foreground" ; }
