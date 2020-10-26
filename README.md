@@ -136,6 +136,11 @@ Note how the map key `[1 2]`, despite being a vector, is not rendered as an inte
 **for a more complete code example, view the `coll-pen/demo/main.cljs` source file**
 
 
+## Contributions
+
+Contributions and feature requests are welcome.
+
+Feedback on accessibility would also be appreciated, as I am trying to improve my understanding of accessibility to better support all users in my projects.
 
 ## License
 
