@@ -100,7 +100,7 @@
                      with a function of 3 arguments: [coll path loaded-callback]. `coll`
                      is the collection that is trying to load, `path` is the associative
                      keyseq of where the collection is the provided root collection (like
-                     what would be used for `get-in`, `assoc-in`, etc. `loaded-callback` is
+                     what would be used for `get-in`, `assoc-in`, etc.) `loaded-callback` is
                      a function which should be called with a single argument `expanded-sub-paths`,
                      which should be a sequence of sub-paths which were also loaded (or nil),
                      once the data has been loaded to clear the loading animation. The provided
@@ -155,6 +155,7 @@
                    :background   :foreground   :shadow    :highlight
                    :control      :active       :disabled  :status    :error
                    :string       :keyword      :symbol    :number    :other  :idx
+                   :font
                 missing keys will be substituted from the :dark theme. If a font is specified,
                 it should be monospaced.
 
