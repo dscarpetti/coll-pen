@@ -1,6 +1,6 @@
 (defproject coll-pen "0.2.0"
   :description "Reactive ClojureScript Collection Interactive Visualization"
-  :url "http://example.com/FIXME"
+  :url "https://dscarpetti.github.io/coll-pen/"
   :license {:copywrite "2020 David Scarpetti"
             :name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
