@@ -2,6 +2,8 @@
 
 A ClojureScript library to interactively visualize and edit clojure collections
 
+[![Clojars Project](https://img.shields.io/clojars/v/coll-pen.svg)](https://clojars.org/coll-pen)
+
 ## Overview
 
 ![Features Example Image](https://dscarpetti.github.io/coll-pen/images/feature-example.png)
