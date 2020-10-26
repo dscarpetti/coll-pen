@@ -8,14 +8,14 @@
   (str "
 
 .coll-pen-reader-label { display: inline-block; width: 0; height: 0; display: none; }
-.coll-pen { background-color: "background"; width: max-content; }
+.coll-pen { background-color: "background"; width: max-content; max-width: 100%; }
 .coll-pen-value-collapsed { color: "control"; }
-.coll-pen-value-string { color: "string"; }
-.coll-pen-value-keyword { color: "keyword"; }
-.coll-pen-value-namespace { color: "active"; }
+.coll-pen-value-string { color: "string"; word-break: break-all; }
+.coll-pen-value-keyword { color: "keyword"; white-space: nowrap;}
+.coll-pen-value-namespace { color: "active"; white-space: nowrap; }
 .coll-pen-value-namespace::after { content: \"/\" ; color: "foreground" ; }
-.coll-pen-value-symbol { color: "symbol"; }
-.coll-pen-value-number { color: "number"; }
+.coll-pen-value-symbol { color: "symbol";  white-space: nowrap; }
+.coll-pen-value-number { color: "number";  white-space: nowrap;}
 .coll-pen-value-other { color: "other"; }
 .coll-pen-value-coll { color: "status"; }
 .coll-pen-value-vec-idx.coll-pen-value-number { color: "idx"; }
