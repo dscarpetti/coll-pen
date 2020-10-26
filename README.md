@@ -8,7 +8,7 @@ A ClojureScript library to interactively visualize and edit clojure collections
 
 Coll-pen renders clojure collections as interactive elements using [reagent](https://github.com/reagent-project/reagent). It was generally built for development or internal use, and is great for examining the state of an app. That said, it can certainly be used as a component in end-user applications as well.
 
-Additionally, it is fully keyboard navigable and __designed with accessibility in mind__.
+Additionally, it is fully keyboard navigable and *designed with accessibility in mind*.
 
 ## Demo
 
@@ -29,15 +29,15 @@ There is one main function, `coll-pen.core/draw` which takes one or two paramete
       - `:old-value` - the old value associated with the key
       - `:new-value` - the new value associated with the key :deleted -> true if the key was deleted/removed
 	- `:search-handler` - either a keyword indicating one of the built-in search functions or a functions of two arguments `[coll search-string]` which should return a collection of results. If nil, search functionality will be disabled. Built-in search functions are
-	  - `:subs` - substring search *(default)*
+	  - `:subs` - substring search **(default)**
         `:regex` - regular expression search
 		`:prefix` - prefix string search
 		`:eq` - equality/exact-match search
 	- `:search-instructions` - a string to explain searching, can be used to override the built-in search function instructions
-	- `:expanded-paths` - a sequence of paths which are initially loaded/expanded. If a keyword is supplied instead, all paths will be expanded by default. Default* `'([])`
+	- `:expanded-paths` - a sequence of paths which are initially loaded/expanded. If a keyword is supplied instead, all paths will be expanded by default. **Default** `'([])`
 	- `:estimated-count-fn` - a function which will be called to determine the size of a collapsed/unloaded collection. If `:load-data-fn` is nil, the default is `count`.
-	- `:el-per-page` - number of elements to show in a collection before paginating. *Default* `10`
-	- `:truncate` - permitted length of a string before it is truncated. Falsely value disables truncation. *Default* `35`
+	- `:el-per-page` - number of elements to show in a collection before paginating. **Default** `10`
+	- `:truncate` - permitted length of a string before it is truncated. Falsely value disables truncation. **Default** `35`
 	- `:palette` - `:dark`, `:light`, or map with the following keys specifying colors (and font): `:background` `:foreground` `:shadow` `:highlight` `:control` `:active` `:disabled` `:status` `:error` `:string` `:keyword` `:symbol` `:number` `:other` `:idx` `:font`. Missing keys will be substituted from the `:dark` theme.
 	- `:custom-renderer` - a function of one argument which will be called before rendering a collection or value. If it evaluates to nil the default renderer will be used.
 	- `:always-highlight` - by default, highlighting behavior is reduced when using mouse-interaction setting this to true will always use keyboard-interaction highlight behavior.
@@ -50,10 +50,10 @@ The other available functions are:
 ## Usage Notes
 
 The display and editing functionality varies between the four main collection types:
-  - *map* - add key-value pair, edit value, delete key-value-pair
-  - *vector* - add element, delete last element
-  - *set* - add element, edit element, delete element
-  - *sequence* - only the whole collection can be editing (by interacting with the key in the parent collection)
+  - **map** - add key-value pair, edit value, delete key-value-pair
+  - **vector** - add element, delete last element
+  - **set** - add element, edit element, delete element
+  - **sequence** - only the whole collection can be editing (by interacting with the key in the parent collection)
 
 Nested collections are only rendered as elements if their parent is associative, otherwise they are rendered as text. So, the children of `map`s and `vector`s will be interactive collections, but the children of `set`s and `sequence`s will always be text. Map keys are always rendered as text.
 
@@ -61,7 +61,7 @@ Nested collections are only rendered as elements if their parent is associative,
 
 ### Mouse
   - Clicking on the opening bracket/brace will expand/collapse the collection
-  - If an editor handler is present, clicking on a map key, vector index, or set element will open the editor. *To delete an element, clear the value out of editor field, if it is eligable for deletion a delete control will appear*
+  - If an editor handler is present, clicking on a map key, vector index, or set element will open the editor. *To delete an element, clear the value out of editor field, if it is eligible for deletion a delete control will appear*
   - If an editor handler is present, clicking on the `+` will open the element adder
   - If pagination is visible, clicking the page indication (e.g. `3/7`) will open a page-jump field
   - If the page jump field is open and searching is enabled, clicking the `?` will open the search field.
@@ -72,7 +72,7 @@ Nested collections are only rendered as elements if their parent is associative,
   - If an editor handler is present, `Enter` on a map key, vector index, or set element opens the editor
   - If pagination is focused, `ArrowLeft` and `ArrowRight` will move between pages. `Enter` will open a page-jump field and `?` will open the search field
   - If an editor is open and the value is valid `Ctrl/Cmd + Enter` will save
-  - If an editor is open and is eligable for deletions `Ctrl/Cmd + Backspace/Delete` will delete
+  - If an editor is open and is eligible for deletions `Ctrl/Cmd + Backspace/Delete` will delete
   - `Escape` will close jump, search, and editor fields
 
 ## Examples
@@ -129,7 +129,7 @@ Nested collections are only rendered as elements if their parent is associative,
 
 ### Demo
 
-*for a more complete code example, view the source of the `coll-pen.core/demo/main.cljs` namespace*
+**for a more complete code example, view the source of the `coll-pen.core/demo/main.cljs` namespace**
 
 
 
