@@ -4,7 +4,7 @@ A ClojureScript library to interactively visualize and edit clojure collections
 
 ## Overview
 
-![Features Example Image](images/feature-example.png)
+![Features Example Image](https://dscarpetti.github.io/coll-pen/images/feature-example.png)
 
 Coll-pen renders clojure collections as interactive elements using [reagent](https://github.com/reagent-project/reagent). It was generally built for development or internal use, and is great for examining the state of an app. That said, it can certainly be used as a component in end-user applications as well.
 
@@ -12,7 +12,7 @@ Additionally, it is fully keyboard navigable and __designed with accessibility i
 
 ## Demo
 
-Check out the [demo](demo/index.html)
+Check out the [demo](https://dscarpetti.github.io/coll-pen)
 
 ## API
 
@@ -90,7 +90,7 @@ Nested collections are only rendered as elements if their parent is associative,
 (cp/draw {'a :map} {:key :map})
 ```
 
-![Map Example Image](images/map.png)
+![Map Example Image](https://dscarpetti.github.io/coll-pen/images/map.png)
 
 
 ### Vector
@@ -99,7 +99,7 @@ Nested collections are only rendered as elements if their parent is associative,
 (cp/draw ["this" "is" "a" "vector"] {:key :vector})
 ```
 
-![Vector Example Image](images/vector.png)
+![Vector Example Image](https://dscarpetti.github.io/coll-pen/images/vector.png)
 
 
 ### Set
@@ -108,7 +108,7 @@ Nested collections are only rendered as elements if their parent is associative,
 (cp/draw #{'example/set} {:key :set})
 ```
 
-![Set Example Image](images/set.png)
+![Set Example Image](https://dscarpetti.github.io/coll-pen/images/set.png)
 
 
 ### Sequence
@@ -117,7 +117,7 @@ Nested collections are only rendered as elements if their parent is associative,
 (cp/draw '(a "sequence" :of [:elements]) {:key :seq})
 ```
 
-![Sequence Example Image](images/seq.png)
+![Sequence Example Image](https://dscarpetti.github.io/coll-pen/images/seq.png)
 
 ### Nested Collections
 
@@ -125,7 +125,7 @@ Nested collections are only rendered as elements if their parent is associative,
 (cp/draw {[1 2] [3 #{4 5}]} {:key :nested})
 ```
 
-![Nested Example Image](images/next.png)
+![Nested Example Image](https://dscarpetti.github.io/coll-pen/images/next.png)
 
 ### Demo
 
