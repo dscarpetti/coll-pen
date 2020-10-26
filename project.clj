@@ -1,4 +1,4 @@
-(defproject coll-pen "0.1.0-SNAPSHOT"
+(defproject coll-pen "0.2.0"
   :description "Reactive cljs collection visualizer"
   :url "http://example.com/FIXME"
   :license {:copywrite "2020 David Scarpetti"
@@ -17,6 +17,16 @@
             "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
             "fig:min"   ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "dev"]
             "fig:test"  ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" "coll-pen.test-runner"]}
+
+  :plugins [[lein-cljsbuild "1.1.8"]]
+
+  :cljsbuild {:builds [{:id "demo"
+                        :source-paths ["src"]
+                        :compiler {:output-to "demo/demo.js"
+                                   :optimizations :advanced
+                                   :output-dir "target/js/browser"
+                                   :main coll-pen.demo.main
+                                   :pretty-print false}}]}
 
   :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.2.11"]
                                   [com.bhauman/rebel-readline-cljs "0.1.4"]]

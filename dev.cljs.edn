@@ -2,4 +2,4 @@
   :css-dirs ["resources/public/css"]
   :auto-testing true
    }
-{:main coll-pen.demo}
+{:main coll-pen.demo.main}
