@@ -22,7 +22,13 @@
                                                     :description "If provided, it will be called when a collection is first expanded with a function of 3 arguments: [coll path loaded-callback]. `coll` is the collection that is trying to load, `path` is the associative keyseq of where the collection is the provided root collection (like what would be used for `get-in`, `assoc-in`, etc.) `loaded-callback` is a function which should be called with a single argument `expanded-sub-paths`, which should be a sequence of sub-paths which were also loaded (or nil), once the data has been loaded to clear the loading animation. The provided sub-paths will be marked as loaded and automatically expanded. (You can use the `unroll-paths` helper function to generate all sub-paths of a given collection). If a load-data-fn is not supplied, it is assumed that the entire collection is already loaded."}
 
                                      :edit-handler {:type 'function
-                                                    :description "If provided, add/remove/edit controls will appear. When and edit is made the `edit-handler` function will be called with 3 arguments: [edit-map success-callback error-callback]. The callbacks each optionally take a single argument which will display as a string to the user. The edit-map is of the form: {:old-coll -> the collection before editing :new-coll -> the collection after editing :path -> path keyseq of the coll relative to the root :key -> the key in the collection which was edited :old-value -> the old value associated with the key :new-value -> the new value associated with the key :deleted -> true if the key was deleted/removed}"}
+                                                    :description "If provided, add/remove/edit controls will appear. When and edit is made the `edit-handler` function will be called with 3 arguments: [edit-map success-callback error-callback]. The callbacks each optionally take a single argument which will display as a string to the user."
+                                                    :edit-map-key {:old-coll "the collection before editing"
+                                                                   :new-coll "the collection after editing"
+                                                                   :path "path keyseq of the coll relative to the root"
+                                                                   :key "the key in the collection which was edited"
+                                                                   :old-value "the old value associated with the key"
+                                                                   :new-value "the new value associated with the key :deleted -> true if the key was deleted/removed"}}
 
                                      :search-handler {:type #{'keyword 'function}
                                                       :default :subs
@@ -99,7 +105,7 @@
       (render-el [this]
         [:img.custom {:alt alt :src src}]))))
 
-(def examples
+(def demo
   {:people [{:name {:first "Jane" :last "Smith"}
              :age 27
              :color 'red
@@ -148,4 +154,35 @@
      :img (->Image
            "monalisa"
            "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg")}}
+   })
+
+
+(def examples
+  {:description {:coll-pen "Utility for Beautiful Data Drawings"
+                 :version 0.2
+                 :interactive? true
+                 :possible-use-cases '(admin-console
+                                       dev-visualizer
+                                       app-monitor
+                                       user-interface
+                                       data-explorer
+                                       structure-prototyper
+                                       app-simulator
+                                       something-else-even-cooler)
+                 :features ["Beautiful Rendering"
+                            "Theming"
+                            "Expand/Collapse nested collections"
+                            "Support for Dynamic Data Loading"
+                            "Built-in Pagination"
+                            "Optional Collection Searching"
+                            "Optional Collection Editing"]
+                 :dependencies #{'org.clojure/clojure 'org.clojure/clojurescript 'reagent}}
+
+
+
+   :map {'a :map}
+   :vec ["this" "is" "a" "vector"]
+   :set #{'example/set}
+   :seq '(a "sequence" :of [:elements])
+   :nested {[1 2] [3 #{4 5}]}
    })

@@ -7,9 +7,9 @@
    [reagent.dom :as rdom]))
 
 
-(defonce app-state (r/atom {:tab :example
-                            :example-data data/examples
-                            :api-data data/api}))
+(def app-state (r/atom {:tab :demo
+                        :demo-data data/demo
+                        }))
 
 (defonce custom-css (cp/create-css-link
                      "a.custom { color: #7cb7ba; }"
@@ -23,44 +23,66 @@
     [:div
      custom-css
      [:div.tabs
-      [:button {:disabled (= tab :example)
-                :on-click #(swap! app-state assoc :tab :example)}
-       "General Examples"]
+      [:button {:disabled (= tab :demo)
+                :on-click #(swap! app-state assoc :tab :demo)}
+       "Editable Demo"]
       [:button {:disabled (= tab :api)
                 :on-click #(swap! app-state assoc :tab :api)}
-       "API Explorer"]]
+       "API Explorer"]
+      [:button {:disabled (= tab :examples)
+                :on-click #(swap! app-state assoc :tab :examples)}
+       "Examples"]]
+
 
      [:div.content
-      (if (= tab :example)
-        (cp/draw (:example-data state)
-                 {:key :example
-                  :estimated-count-fn count
-                  :custom-renderer (fn [val]
-                                     (when (implements? data/CustomRender val)
-                                       (data/render-el val)))
-                  :load-data-fn (fn [coll path cb]
-                                  (let [simulated-loading-time (+ 500 (rand-int 1000))]
-                                    (if (and (== 2 (count path)) (= (path 0) :people))
-                                      (js/setTimeout #(cb (cp/unroll-paths coll)) simulated-loading-time)
-                                      (js/setTimeout cb simulated-loading-time))))
-                  :edit-handler
-                  (fn [{:keys [old-coll new-coll path k old-value new-value delete]} ok-cb fail-cb]
-                    (condp < (rand)
-                      .95 (js/setTimeout #(fail-cb "Random failure") 1000)
-                      .90 (throw (ex-info "Random error" {:nothing :really}))
-                      (js/setTimeout #(do
-                                        (if (empty? path)
-                                          (swap! app-state assoc :example-data new-coll)
-                                          (swap! app-state assoc-in (into [:example-data] path) new-coll))
-                                        (ok-cb "Did it!")) 1000)))})
-        (cp/draw (:api-data state) {:truncate false
-                                    :key :api
-                                    :expanded-paths [[]
-                                                     [:functions]
-                                                     [:functions 'draw]
-                                                     [:functions 'unroll-paths]
-                                                     [:functions 'create-css-link]
-                                                     [:functions 'clear-state-data!]]}))]]))
+      (case tab
+        :demo (cp/draw (:demo-data state)
+                       {:key :example
+                        :estimated-count-fn count
+                        :custom-renderer (fn [val]
+                                           (when (implements? data/CustomRender val)
+                                             (data/render-el val)))
+                        :load-data-fn (fn [coll path cb]
+                                        (let [simulated-loading-time (+ 500 (rand-int 1000))]
+                                          (if (and (== 2 (count path)) (= (path 0) :people))
+                                            (js/setTimeout #(cb (cp/unroll-paths coll)) simulated-loading-time)
+                                            (js/setTimeout cb simulated-loading-time))))
+                        :edit-handler
+                        (fn [{:keys [old-coll new-coll path k old-value new-value delete]} ok-cb fail-cb]
+                          (condp < (rand)
+                            .95 (js/setTimeout #(fail-cb "Random failure") 1000)
+                            .90 (throw (ex-info "Random error" {:nothing :really}))
+                            (js/setTimeout #(do
+                                              (if (empty? path)
+                                                (swap! app-state assoc :example-data new-coll)
+                                                (swap! app-state assoc-in (into [:example-data] path) new-coll))
+                                              (ok-cb "Did it!")) 1000)))})
+        :api (cp/draw data/api {:truncate false
+                                :key :api
+                                :expanded-paths [[]
+                                                 [:functions]
+                                                 [:functions 'draw]
+                                                 [:functions 'unroll-paths]
+                                                 [:functions 'create-css-link]
+                                                 [:functions 'clear-state-data!]]})
+
+        :examples [:span
+                   [:div
+                    (cp/draw (:description data/examples) {:expanded-paths :all
+                                                           :el-per-page 7
+                                                           :edit-handler (fn [_ ok-cb fail-cb]
+                                                                           (fail-cb "Editing isn't actually enabled in this example :("))})
+                    (cp/draw (:map data/examples))
+                    (cp/draw (:vec data/examples))
+                    (cp/draw (:set data/examples))
+                    (cp/draw (:seq data/examples))
+                    (cp/draw (:nesting data/examples))
+                    ]]
+
+
+
+        )]]))
+
 
 
 
