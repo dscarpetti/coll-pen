@@ -1,5 +1,6 @@
 (ns coll-pen.core
   (:require
+   [clojure.string :as str]
    [coll-pen.coll :as coll]
    [coll-pen.css :as css]
    [coll-pen.delim :as delim]
@@ -67,6 +68,11 @@
          [:div.coll-pen
           {:class (if highlight "coll-pen-highlight-on" "coll-pen-highlight-off")}
           (coll/draw-el config coll [])]]))))
+
+(defn create-css-link [& css-strs]
+  [:link {:rel "stylesheet" :type "text/css"
+          :href
+          (css/to-encoded-css-uri (str/join "\n" css-strs))}])
 
 (defn draw
   "Evaluates to a reagent/react component which draws the supplied collection.
