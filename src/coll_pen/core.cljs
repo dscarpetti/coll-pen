@@ -9,10 +9,33 @@
 
 (defonce reload-states (atom {}))
 
-(defn clear-dynamic-reload-states!
+(defn clear-dynamic-reload-data!
   "clears state associated with any :dynamic-reload-key(s)"
   []
   (reset! reload-states {}))
+
+(defn create-css-link
+  "Creates a uri encoded data link element to inject styles"
+  [& css-strs]
+  [:link {:rel "stylesheet" :type "text/css"
+          :href
+          (css/to-encoded-css-uri (str/join "\n" css-strs))}])
+
+(defn unroll-paths
+  "generates all sub-paths of a coll, useful for autoexpanding
+  a loaded collection when calling a load-data-fn callback.
+  e.g. (cb (unroll-paths loaded-collection))"
+  ([x]
+   (unroll-paths [] [] x))
+  ([paths prefix x]
+   (if-not (coll? x)
+     paths
+     (let [paths (conj paths prefix)]
+       (if-not (or (map? x) (vector? x))
+         paths
+         (reduce-kv (fn [paths k v]
+                      (unroll-paths paths (conj prefix k) v))
+                    paths x))))))
 
 (defn -draw [coll load-data-fn estimated-count-fn expanded-paths
              el-per-page always-highlight custom-renderer truncate
@@ -69,11 +92,6 @@
           {:class (if highlight "coll-pen-highlight-on" "coll-pen-highlight-off")}
           (coll/draw-el config coll [])]]))))
 
-(defn create-css-link [& css-strs]
-  [:link {:rel "stylesheet" :type "text/css"
-          :href
-          (css/to-encoded-css-uri (str/join "\n" css-strs))}])
-
 (defn draw
   "Evaluates to a reagent/react component which draws the supplied collection.
 
@@ -83,10 +101,15 @@
                      is the collection that is trying to load, `path` is the associative
                      keyseq of where the collection is the provided root collection (like
                      what would be used for `get-in`, `assoc-in`, etc. `loaded-callback` is
-                     a function which should be called with zero arguments once the data
-                     has been loaded to clear the loading animation. If a load-data-fn is
-                     not supplied, it is assumed that the entire collection is already
-                     loaded.
+                     a function which should be called with a single argument `expanded-sub-paths`,
+                     which should be a sequence of sub-paths which were also loaded (or nil),
+                     once the data has been loaded to clear the loading animation. The provided
+                     sub-paths will be marked as loaded and automatically expanded. (You can
+                     use the `unroll-paths` helper function to generate all sub-paths of a
+                     given collection).
+
+                     If a load-data-fn is not supplied, it is assumed that the entire collection
+                     is already loaded.
 
     :edit-handler -> if provided, add/remove/edit controls will appear. When and edit is made
                      the `edit-handler` function will be called with 3 arguments:

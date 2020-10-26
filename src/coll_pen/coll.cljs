@@ -347,7 +347,16 @@
         load-data-fn (:load-data-fn config)
         ;;disable-loading-animation false;;(:disable-loading-animation config)
 
-        loaded-callback (fn callback [_new-coll]
+        loaded-callback (fn callback [sub-paths]
+                          (doseq [sub-path sub-paths]
+                            (when (coll? sub-path)
+                              (let [p (into path sub-path)]
+                                (swap! init-states
+                                         #(-> %
+                                            (assoc-in [p :loaded] true)
+                                            (update p dissoc :loading)
+                                            (assoc-in [p :expanded] true))))))
+
                           (input/set-global-focus-key! react-key)
                           (swap! init-states update path dissoc :loading)
                           (swap! local-state dissoc :loading))
