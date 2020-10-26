@@ -119,6 +119,8 @@ Nested collections are only rendered as elements if their parent is associative,
 
 ![Sequence Example Image](https://dscarpetti.github.io/coll-pen/images/seq.png)
 
+Note how the last item `[:element]` is not rendered as a collection because a sequence is not an associative structure.
+
 ### Nested Collections
 
 ```clojure
@@ -126,6 +128,8 @@ Nested collections are only rendered as elements if their parent is associative,
 ```
 
 ![Nested Example Image](https://dscarpetti.github.io/coll-pen/images/nest.png)
+
+Note how the map key `[1 2]`, despite being a vector, is not rendered as an interactive collection.
 
 ### Demo
 
