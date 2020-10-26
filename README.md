@@ -129,7 +129,7 @@ Nested collections are only rendered as elements if their parent is associative,
 
 ### Demo
 
-**for a more complete code example, view the source of the `coll-pen.core/demo/main.cljs` namespace**
+**for a more complete code example, view the `coll-pen/demo/main.cljs` source file**
 
 
 
