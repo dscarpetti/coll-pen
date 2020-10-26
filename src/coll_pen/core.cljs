@@ -45,7 +45,6 @@
         depth-color-count (count depth-colors)
         supplied-expanded-paths expanded-paths
         expanded-paths (when (coll? expanded-paths) expanded-paths)
-        _ (println load-data-fn)
         init-states (if (or (not key) (nil? (@reload-states key)))
                       (atom (reduce (fn [m path] (assoc m path {:expanded true :loaded true})) {} expanded-paths))
                       (@reload-states key))
