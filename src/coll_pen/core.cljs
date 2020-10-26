@@ -9,8 +9,8 @@
 
 (defonce reload-states (atom {}))
 
-(defn clear-dynamic-reload-data!
-  "clears state associated with any :dynamic-reload-key(s)"
+(defn clear-state-data!
+  "clears state associated with any :key(s)"
   []
   (reset! reload-states {}))
 
@@ -39,15 +39,16 @@
 
 (defn -draw [coll load-data-fn estimated-count-fn expanded-paths
              el-per-page always-highlight custom-renderer truncate
-             palette dynamic-reload-key edit-handler search-handler search-instructions]
+             palette key edit-handler search-handler search-instructions]
   (let [css-link (css/gen-css-link-el palette)
         depth-colors (css/get-depth-colors palette)
         depth-color-count (count depth-colors)
         supplied-expanded-paths expanded-paths
         expanded-paths (when (coll? expanded-paths) expanded-paths)
-        init-states (if (or (not dynamic-reload-key) (nil? (@reload-states dynamic-reload-key)))
+        _ (println load-data-fn)
+        init-states (if (or (not key) (nil? (@reload-states key)))
                       (atom (reduce (fn [m path] (assoc m path {:expanded true :loaded true})) {} expanded-paths))
-                      (@reload-states dynamic-reload-key))
+                      (@reload-states key))
         config {:depth-colors depth-colors
                 :edit-handler edit-handler
                 :search-handler search-handler
@@ -78,12 +79,12 @@
                      (when @tab-highlight
                        (reset! tab-highlight false))))]
 
-    (when (and dynamic-reload-key (nil? (@reload-states dynamic-reload-key)))
-      (swap! reload-states assoc dynamic-reload-key init-states))
+    (when (and key (nil? (@reload-states key)))
+      (swap! reload-states assoc key init-states))
 
     (fn [coll load-data-fn estimated-count-fn expanded-paths
          el-per-page always-highlight custom-renderer truncate
-         palette dynamic-reload-key edit-handler search-handler search-instructions]
+         palette key edit-handler search-handler search-instructions]
       (let [highlight @tab-highlight]
         [:span {:on-key-down on-key-down
                 :on-click on-click}
@@ -167,20 +168,25 @@
                          setting this to true will always use keyboard-interaction highlight
                          behavior.
 
-    :dynamic-reload-key -> if provided, it will be used to preserve the internal state of the
-                           display across dynamic reloads. Useful when using tools like figwheel."
-  [coll & {:keys [load-data-fn edit-handler search-handler search-instructions
-                  expanded-paths estimated-count-fn el-per-page truncate palette custom-renderer
-                  always-highlight dynamic-reload-key ]
-                    :or {expanded-paths '([]) el-per-page 10 truncate 35 palette :dark search-handler :subs}}]
-  (let [el-per-page (if (and (number? el-per-page) (pos? el-per-page))
-                      el-per-page
-                      10)
-        estimated-count-fn (if estimated-count-fn estimated-count-fn (when-not load-data-fn count))
-        search-handler (search/get-search-handler search-handler)
-        truncate (when (int? truncate) truncate)
-        search-instructions (or search-instructions (:coll-pen/instructions (meta search-handler)) "Search")]
-    [-draw
-     coll load-data-fn estimated-count-fn expanded-paths
-     el-per-page always-highlight custom-renderer truncate
-     palette dynamic-reload-key edit-handler search-handler search-instructions]))
+    :key -> Used to ensure a unique react component is created.
+            It also will be used to preserve the internal state of the display across dynamic reloads.
+            (Particularly useful when using tools like figwheel.)
+            State data can be reset by calling `clear-state-data!`."
+  ([coll]
+   (draw coll nil))
+  ([coll {:as opts :keys [load-data-fn edit-handler search-handler search-instructions
+                          expanded-paths estimated-count-fn el-per-page truncate palette custom-renderer
+                          always-highlight key]
+          :or {expanded-paths '([]) el-per-page 10 truncate 35 palette :dark search-handler :subs}}]
+   (let [el-per-page (if (and (number? el-per-page) (pos? el-per-page))
+                       el-per-page
+                       10)
+         estimated-count-fn (if estimated-count-fn estimated-count-fn (when-not load-data-fn count))
+         search-handler (search/get-search-handler search-handler)
+         truncate (when (int? truncate) truncate)
+         search-instructions (or search-instructions (:coll-pen/instructions (meta search-handler)) "Search")]
+     [:span {:key key}
+      [-draw
+       coll load-data-fn estimated-count-fn expanded-paths
+       el-per-page always-highlight custom-renderer truncate
+       palette key edit-handler search-handler search-instructions]])))
