@@ -117,6 +117,7 @@
                      take a single argument which will display as a string to the user. The
                      edit-map is of the form: {:old-coll -> the collection before editing
                                                :new-coll -> the collection after editing
+                                               :path -> path keyseq of the coll relative to the root
                                                :key -> the key in the collection which was edited
                                                :old-value -> the old value associated with the key
                                                :new-value -> the new value associated with the key
