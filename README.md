@@ -125,7 +125,7 @@ Nested collections are only rendered as elements if their parent is associative,
 (cp/draw {[1 2] [3 #{4 5}]} {:key :nested})
 ```
 
-![Nested Example Image](https://dscarpetti.github.io/coll-pen/images/next.png)
+![Nested Example Image](https://dscarpetti.github.io/coll-pen/images/nest.png)
 
 ### Demo
 
