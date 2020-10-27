@@ -7,8 +7,8 @@
    [reagent.dom :as rdom]))
 
 
-(def app-state (r/atom {:tab :demo
-                        :demo-data data/demo
+(defonce app-state (r/atom {:tab :demo
+                            :demo-data data/demo
                         }))
 
 (defonce custom-css (cp/create-css-link
@@ -54,9 +54,9 @@
                             .90 (throw (ex-info "Random error" {:nothing :really}))
                             (js/setTimeout #(do
                                               (if (empty? path)
-                                                (swap! app-state assoc :example-data new-coll)
-                                                (swap! app-state assoc-in (into [:example-data] path) new-coll))
-                                              (ok-cb "Did it!")) 1000)))})
+                                                (swap! app-state assoc :demo-data new-coll)
+                                                (swap! app-state assoc-in (into [:demo-data] path) new-coll))
+                                              (ok-cb (when (< (rand) 0.5) "Did it!"))) 1000)))})
         :api (cp/draw data/api {:truncate false
                                 :key :api
                                 :expanded-paths [[]

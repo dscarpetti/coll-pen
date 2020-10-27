@@ -22,7 +22,7 @@
 
   :cljsbuild {:builds [{:id "demo"
                         :source-paths ["src"]
-                        :compiler {:output-to "demo/demo.js"
+                        :compiler {:output-to "docs/demo.js"
                                    :optimizations :advanced
                                    :output-dir "target/js/browser"
                                    :main coll-pen.demo.main
