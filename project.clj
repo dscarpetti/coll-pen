@@ -1,4 +1,4 @@
-(defproject coll-pen "0.2.0"
+(defproject coll-pen "0.2.1"
   :description "Reactive ClojureScript Collection Interactive Visualization"
   :url "https://dscarpetti.github.io/coll-pen/"
   :license {:copywrite "2020 David Scarpetti"
