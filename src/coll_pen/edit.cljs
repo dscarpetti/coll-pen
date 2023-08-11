@@ -36,7 +36,7 @@
   ([content clear-fn]
    (when content
      [:span.coll-pen-alert.coll-pen-error
-      {:aria-role :alert
+      {:role :alert
        :tab-index "0"
        :style {:cursor :pointer}
        :title "clear alert"
@@ -46,7 +46,7 @@
   ([content clear-fn div]
    (when content
      [:div.coll-pen-alert.coll-pen-error
-      {:aria-role :alert
+      {:role :alert
        :tab-index "0"
        :style {:cursor :pointer}
        :title "clear alert"
@@ -57,7 +57,7 @@
 (defn success-alert [content clear-fn]
   (when content
     [:span.coll-pen-alert.coll-pen-success
-     {:aria-role :alert
+     {:role :alert
       :tab-index "0"
       :style {:cursor :pointer}
       :title "clear alert"
@@ -266,7 +266,7 @@
       (fn [k msg clear!]
         (let [message (or msg "✓")]
           [:div.coll-pen-success-floater {:key k
-                                          :aria-role "alert"
+                                          :role :alert
                                           :aria-label (or msg "success")
                                           :style {:right (str (count message) "ch")}
                                           } message ]))})))
@@ -284,7 +284,7 @@
       (fn [k msg clear!]
         (let [message (or msg "✓")]
           [:div.coll-pen-success-floater-bar {:key k
-                                              :aria-role "alert"
+                                              :role :alert
                                               :aria-label (or msg "success")
                                               } message ]))})))
 
@@ -353,7 +353,7 @@
                         new-key (:validated key)
                         is-valid (and (:is-valid key) (:is-valid val))]
                     (when is-valid
-                      (let [ok-cb (fn [content] (close-editor!) (clear-waiting!) (clear-error! nil) (set-success! content) (set-focus! new-key))
+                      (let [ok-cb (fn [content] (close-editor!) (clear-waiting!) (clear-error! nil) (set-success! content) (set-focus! new-key) (println "OK"))
                             fail-cb (fn [content]
                                       (swap! init-states assoc-in [path init-state-key] revert-data)
                                       (input/set-global-focus-key! input-focus-key)

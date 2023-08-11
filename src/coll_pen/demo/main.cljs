@@ -50,8 +50,8 @@
                         :edit-handler
                         (fn [{:keys [old-coll new-coll path k old-value new-value delete]} ok-cb fail-cb]
                           (condp < (rand)
-                            .95 (js/setTimeout #(fail-cb "Random failure") 1000)
-                            .90 (throw (ex-info "Random error" {:nothing :really}))
+                            .95 (js/setTimeout #(fail-cb "Sim Random Failure") 1000)
+                            .9 (throw (ex-info "Sim Random Error" {:nothing :really}))
                             (js/setTimeout #(do
                                               (if (empty? path)
                                                 (swap! app-state assoc :demo-data new-coll)

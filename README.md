@@ -31,18 +31,18 @@ There is one main function, `coll-pen.core/draw` which takes one or two paramete
        - `:old-value` - the old value associated with the key
        - `:new-value` - the new value associated with the key :deleted -> true if the key was deleted/removed
      - `:search-handler` - either a keyword indicating one of the built-in search functions or a functions of two arguments `[coll search-string]` which should return a collection of results. If nil, search functionality will be disabled. Built-in search functions are
-	  - `:subs` - substring search **(default)**
+      - `:subs` - substring search **(default)**
         `:regex` - regular expression search
-		`:prefix` - prefix string search
-		`:eq` - equality/exact-match search
-	- `:search-instructions` - a string to explain searching, can be used to override the built-in search function instructions
-	- `:expanded-paths` - a sequence of paths which are initially loaded/expanded. If a keyword is supplied instead, all paths will be expanded by default. **Default** `'([])`
-	- `:estimated-count-fn` - a function which will be called to determine the size of a collapsed/unloaded collection. If `:load-data-fn` is nil, the default is `count`.
-	- `:el-per-page` - number of elements to show in a collection before paginating. **Default** `10`
-	- `:truncate` - permitted length of a string before it is truncated. Falsely value disables truncation. **Default** `35`
-	- `:palette` - `:dark`, `:light`, or map with the following keys specifying colors (and font): `:background` `:foreground` `:shadow` `:highlight` `:control` `:active` `:disabled` `:status` `:error` `:string` `:keyword` `:symbol` `:number` `:other` `:idx` `:font`. Missing keys will be substituted from the `:dark` theme.
-	- `:custom-renderer` - a function of one argument which will be called before rendering a collection or value. If it evaluates to nil the default renderer will be used.
-	- `:always-highlight` - by default, highlighting behavior is reduced when using mouse-interaction setting this to true will always use keyboard-interaction highlight behavior.
+        `:prefix` - prefix string search
+        `:eq` - equality/exact-match search
+    - `:search-instructions` - a string to explain searching, can be used to override the built-in search function instructions
+    - `:expanded-paths` - a sequence of paths which are initially loaded/expanded. If a keyword is supplied instead, all paths will be expanded by default. **Default** `'([])`
+    - `:estimated-count-fn` - a function which will be called to determine the size of a collapsed/unloaded collection. If `:load-data-fn` is nil, the default is `count`.
+    - `:el-per-page` - number of elements to show in a collection before paginating. **Default** `10`
+    - `:truncate` - permitted length of a string before it is truncated. Falsely value disables truncation. **Default** `35`
+    - `:palette` - `:dark`, `:light`, or map with the following keys specifying colors (and font): `:background` `:foreground` `:shadow` `:highlight` `:control` `:active` `:disabled` `:status` `:error` `:string` `:keyword` `:symbol` `:number` `:other` `:idx` `:font`. Missing keys will be substituted from the `:dark` theme.
+    - `:custom-renderer` - a function of one argument which will be called before rendering a collection or value. If it evaluates to nil the default renderer will be used.
+    - `:always-highlight` - by default, highlighting behavior is reduced when using mouse-interaction setting this to true will always use keyboard-interaction highlight behavior.
 
 The other available functions are:
   - `clear-state-data!` - which clears any state associated with keys (only relevant for dynamic reloading situations)
