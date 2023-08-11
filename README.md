@@ -141,7 +141,8 @@ A very simple local edit handler.
 (def state (reagent/atom {:stuff :here}))
 
 (cp/draw state {:edit-handler (fn [{:keys [path new-call]} ok-cb fail-cb]
-                                (swap! state assoc-in path new-coll))})
+                                (swap! state assoc-in path new-coll)
+                                (ok-cb "success"))})
 ```
 
 ### Demo
