@@ -22,15 +22,15 @@ There is one main function, `coll-pen.core/draw` which takes one or two paramete
   - `coll` - the collection to be drawn
   - `opts` - optional options map
     - `:key` - Used to ensure a unique react component is created for the collection. Also used to store state across dynamic reloads (for figwheel-style development) which can be cleared with the `coll-pen.core/clear-state-data!`
-	- `:load-data-fn` - A function of 3 args `[coll path loaded-callback]` which will be called when an unloaded collection is first expanded. If `nil`, all data is presumed to be loaded. `loaded-callback` takes a single optional parameter which should be a sequence of sub-paths (that have been loaded) to auto-expand.
-	- `:edit-handler` - A function of 3 args `[edit-map ok-callback fail-callback]` which is called when an element is added, edited, or deleted. *If `edit-handler` is `nil`, no edit controls will appear.* If an edit is successful `ok-callback` should be called with an optional single success-message parameter. If the update fails, `fail-callback` should be called with an optional `fail-message` parameter. The contents of the `edit-map` will be:
-	  - `:old-coll` - the collection before editing
-      - `:new-coll` - the collection after editing
-      - `:path` path - keyseq of the coll relative to the root
-      - `:key` - the key in the collection which was edited
-      - `:old-value` - the old value associated with the key
-      - `:new-value` - the new value associated with the key :deleted -> true if the key was deleted/removed
-	- `:search-handler` - either a keyword indicating one of the built-in search functions or a functions of two arguments `[coll search-string]` which should return a collection of results. If nil, search functionality will be disabled. Built-in search functions are
+    - `:load-data-fn` - A function of 3 args `[coll path loaded-callback]` which will be called when an unloaded collection is first expanded. If `nil`, all data is presumed to be loaded. `loaded-callback` takes a single optional parameter which should be a sequence of sub-paths (that have been loaded) to auto-expand.
+    - `:edit-handler` - A function of 3 args `[edit-map ok-callback fail-callback]` which is called when an element is added, edited, or deleted. See [example](#edit-handler-example). *If `edit-handler` is `nil`, no edit controls will appear.* If an edit is successful `ok-callback` should be called with an optional single success-message parameter. If the update fails, `fail-callback` should be called with an optional `fail-message` parameter. The contents of the `edit-map` will be:
+       - `:old-coll` - the collection before editing
+       - `:new-coll` - the collection after editing
+       - `:path` path - keyseq of the coll relative to the root
+       - `:key` - the key in the collection which was edited
+       - `:old-value` - the old value associated with the key
+       - `:new-value` - the new value associated with the key :deleted -> true if the key was deleted/removed
+     - `:search-handler` - either a keyword indicating one of the built-in search functions or a functions of two arguments `[coll search-string]` which should return a collection of results. If nil, search functionality will be disabled. Built-in search functions are
 	  - `:subs` - substring search **(default)**
         `:regex` - regular expression search
 		`:prefix` - prefix string search
@@ -132,6 +132,17 @@ Note how the last item `[:element]` is not rendered as a collection because a se
 ![Nested Example Image](https://dscarpetti.github.io/coll-pen/images/nest.png)
 
 Note how the map key `[1 2]`, despite being a vector, is not rendered as an interactive collection.
+
+### Edit Handler Example
+
+A very simple local edit handler.
+
+```clojure
+(def state (reagent/atom {:stuff :here}))
+
+(cp/draw state {:edit-handler (fn [{:keys [path new-call]} ok-cb fail-cb]
+                                (swap! state assoc-in path new-coll))})
+```
 
 ### Demo
 
