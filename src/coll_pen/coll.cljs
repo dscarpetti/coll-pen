@@ -133,7 +133,7 @@
           (delim/open coll-type delim-color "5")
           [:span.coll-pen-el [:span.coll-pen-empty-placeholder]]
           (when (and edit-handler (not (keyword-identical? coll-type :seq)))
-            [edit/value-adder edit-handler config (str react-key "_") original-coll path coll-type])
+            [edit/value-adder edit-handler config (str react-key "_") original-coll path coll-type #()])
           (delim/close coll-type delim-color "5")]])})))
 
 (defn recursively-check-loaded-status [init-states parent-coll parent-path k]
